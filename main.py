@@ -1423,14 +1423,25 @@ def main(argv):
     i = 0
     while i < len(argv):
         arg = argv[i]
-        if arg == "--list":
+        if arg in ("-h", "--help"):
+            sys.stdout.write(__doc__)
+            return 0
+        elif arg == "--list":
             show_list = True
         elif arg == "--port" and i + 1 < len(argv):
-            port = int(argv[i + 1])
+            try:
+                port = int(argv[i + 1])
+            except ValueError:
+                sys.stderr.write("aggregator: --port needs an integer\n")
+                return 2
             i += 1
         elif arg == "--host" and i + 1 < len(argv):
             host = argv[i + 1]
             i += 1
+        else:
+            sys.stderr.write("aggregator: unknown argument %r\n" % arg)
+            sys.stderr.write("usage: python3 main.py [--list] [--port N] [--host HOST]\n")
+            return 2
         i += 1
     env_url = (os.environ.get("MAKEFUN_ENV_URL") or "").rstrip("/")
     prompt_file = os.environ.get("MAKEFUN_PROMPT_FILE") or ""
